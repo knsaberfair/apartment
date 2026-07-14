@@ -1,4 +1,4 @@
-export type PageKey =
+export type BuiltInPageKey =
   | 'dashboard'
   | 'properties'
   | 'tenants'
@@ -7,3 +7,6 @@ export type PageKey =
   | 'finance'
   | 'reconciliation'
   | 'permissions'
+
+export type CustomPageKey = `custom:${string}`
+export type PageKey = BuiltInPageKey | CustomPageKey

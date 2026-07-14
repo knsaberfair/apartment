@@ -7,6 +7,7 @@ import {
   Gauge,
   Home,
   Landmark,
+  PanelTop,
   ReceiptText,
   Search,
   Settings,
@@ -19,7 +20,7 @@ import type { Component } from 'vue'
 import { pageActionPermissions, pagePermissions } from '@/config/permissions'
 import { usePermissions } from '@/composables/usePermissions'
 import type { PermissionKey, RoleKey } from '@/types/auth'
-import type { PageKey } from '@/types/navigation'
+import type { BuiltInPageKey, PageKey } from '@/types/navigation'
 
 const props = defineProps<{
   currentPage: PageKey
@@ -29,9 +30,9 @@ const emit = defineEmits<{
   change: [page: PageKey]
 }>()
 
-const { currentRole, currentUser, roles, hasPermission, setRole } = usePermissions()
+const { currentRole, currentUser, roles, menuResources, hasPermission, setRole } = usePermissions()
 
-const navItems: Array<{ key: PageKey; label: string; hint: string; icon: Component; permission: PermissionKey }> = [
+const builtInNavItems: Array<{ key: BuiltInPageKey; label: string; hint: string; icon: Component; permission: PermissionKey }> = [
   { key: 'dashboard', label: '管理控制台', hint: '运营驾驶舱', icon: Gauge, permission: pagePermissions.dashboard },
   { key: 'properties', label: '房源管理', hint: '楼栋与房间', icon: Building2, permission: pagePermissions.properties },
   { key: 'tenants', label: '租客列表', hint: '住户档案', icon: Users, permission: pagePermissions.tenants },
@@ -42,7 +43,19 @@ const navItems: Array<{ key: PageKey; label: string; hint: string; icon: Compone
   { key: 'permissions', label: '权限管理', hint: '角色与授权', icon: ShieldCheck, permission: pagePermissions.permissions },
 ]
 
-const visibleNavItems = computed(() => navItems.filter((item) => hasPermission(item.permission)))
+const builtInPermissionKeys = new Set(builtInNavItems.map((item) => item.permission))
+const dynamicNavItems = computed(() =>
+  menuResources.value
+    .filter((resource) => !builtInPermissionKeys.has(resource.key))
+    .map((resource) => ({
+      key: `custom:${resource.key}` as PageKey,
+      label: resource.menu_label || resource.label,
+      hint: resource.menu_hint || resource.description,
+      icon: PanelTop,
+      permission: resource.key,
+    })),
+)
+const visibleNavItems = computed(() => [...builtInNavItems, ...dynamicNavItems.value].filter((item) => hasPermission(item.permission)))
 </script>
 
 <template>

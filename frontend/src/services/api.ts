@@ -1,4 +1,13 @@
-import type { CurrentUser, PermissionGroup, PermissionKey, RoleDefinition, RoleKey } from '@/types/auth'
+import type {
+  CreatePermissionResourcePayload,
+  CreateRolePayload,
+  CurrentUser,
+  PermissionGroup,
+  PermissionKey,
+  PermissionResource,
+  RoleDefinition,
+  RoleKey,
+} from '@/types/auth'
 import type {
   Contract,
   DashboardSummary,
@@ -54,7 +63,25 @@ export const api = {
   me: () => request<CurrentUser>('/api/auth/me'),
   roles: () => request<RoleDefinition[]>('/api/auth/roles'),
   permissionCatalog: () => request<PermissionGroup[]>('/api/permissions/catalog'),
+  permissionResources: () => request<PermissionResource[]>('/api/permissions/resources'),
+  permissionMenus: () => request<PermissionResource[]>('/api/permissions/menus'),
+  createPermissionResource: (payload: CreatePermissionResourcePayload) =>
+    request<PermissionResource>('/api/permissions/resources', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    }),
   permissionRoles: () => request<RoleDefinition[]>('/api/permissions/roles'),
+  createRole: (payload: CreateRolePayload) =>
+    request<RoleDefinition>('/api/permissions/roles', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    }),
   updateRolePermissions: (role: RoleKey, permissions: PermissionKey[]) =>
     request<RoleDefinition>(`/api/permissions/roles/${role}/permissions`, {
       method: 'PUT',
