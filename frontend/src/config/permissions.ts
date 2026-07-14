@@ -9,6 +9,7 @@ export const pagePermissions: PagePermissionMap = {
   maintenance: 'maintenance:view',
   finance: 'finance:view',
   reconciliation: 'reconciliation:view',
+  permissions: 'permissions:view',
 }
 
 export const orderedPages: PageKey[] = [
@@ -19,6 +20,7 @@ export const orderedPages: PageKey[] = [
   'maintenance',
   'finance',
   'reconciliation',
+  'permissions',
 ]
 
 export const pageActionPermissions = {
@@ -30,6 +32,7 @@ export const pageActionPermissions = {
   financeCreate: 'finance:create',
   reconciliationImport: 'reconciliation:import',
   reconciliationExport: 'reconciliation:export',
+  permissionManage: 'permissions:manage',
   tasksView: 'tasks:view',
   systemSettings: 'system:settings',
 } satisfies Record<string, PermissionKey>

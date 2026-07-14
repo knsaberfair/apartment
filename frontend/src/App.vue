@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed, onMounted, watch, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import AppShell from '@/components/layout/AppShell.vue'
 import ForbiddenState from '@/components/ui/ForbiddenState.vue'
 import Contracts from '@/pages/Contracts.vue'
 import Dashboard from '@/pages/Dashboard.vue'
 import Finance from '@/pages/Finance.vue'
 import Maintenance from '@/pages/Maintenance.vue'
+import PermissionManagement from '@/pages/PermissionManagement.vue'
 import Properties from '@/pages/Properties.vue'
 import Reconciliation from '@/pages/Reconciliation.vue'
 import Tenants from '@/pages/Tenants.vue'
@@ -23,6 +24,7 @@ const pages = {
   maintenance: Maintenance,
   finance: Finance,
   reconciliation: Reconciliation,
+  permissions: PermissionManagement,
 }
 
 const currentComponent = computed(() => pages[currentPage.value])

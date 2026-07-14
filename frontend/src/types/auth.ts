@@ -27,6 +27,8 @@ export type PermissionKey =
   | 'reconciliation:view'
   | 'reconciliation:import'
   | 'reconciliation:export'
+  | 'permissions:view'
+  | 'permissions:manage'
   | 'system:settings'
   | 'tasks:view'
 
@@ -41,6 +43,22 @@ export interface CurrentUser {
 export interface RoleDefinition {
   key: RoleKey
   label: string
+  permissions: PermissionKey[]
+}
+
+export interface PermissionDefinition {
+  key: PermissionKey
+  label: string
+  description: string
+}
+
+export interface PermissionGroup {
+  key: string
+  label: string
+  permissions: PermissionDefinition[]
+}
+
+export interface UpdateRolePermissionsPayload {
   permissions: PermissionKey[]
 }
 

@@ -1,4 +1,4 @@
-import type { CurrentUser, RoleDefinition, RoleKey } from '@/types/auth'
+import type { CurrentUser, PermissionGroup, PermissionKey, RoleDefinition, RoleKey } from '@/types/auth'
 import type {
   Contract,
   DashboardSummary,
@@ -26,10 +26,12 @@ export function setDemoRoleHeader(role: RoleKey) {
   demoRole = role
 }
 
-async function request<T>(path: string): Promise<T> {
+async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const response = await fetch(path, {
+    ...options,
     headers: {
       'X-Demo-Role': demoRole,
+      ...options.headers,
     },
   })
 
@@ -51,6 +53,16 @@ async function request<T>(path: string): Promise<T> {
 export const api = {
   me: () => request<CurrentUser>('/api/auth/me'),
   roles: () => request<RoleDefinition[]>('/api/auth/roles'),
+  permissionCatalog: () => request<PermissionGroup[]>('/api/permissions/catalog'),
+  permissionRoles: () => request<RoleDefinition[]>('/api/permissions/roles'),
+  updateRolePermissions: (role: RoleKey, permissions: PermissionKey[]) =>
+    request<RoleDefinition>(`/api/permissions/roles/${role}/permissions`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ permissions }),
+    }),
   dashboard: () => request<DashboardSummary>('/api/dashboard/summary'),
   properties: () => request<Property[]>('/api/properties'),
   tenants: () => request<Tenant[]>('/api/tenants'),

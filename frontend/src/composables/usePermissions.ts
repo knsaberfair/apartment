@@ -26,6 +26,10 @@ export function usePermissions() {
     roles.value = await api.roles()
   }
 
+  async function refreshRoles() {
+    roles.value = await api.permissionRoles()
+  }
+
   async function setRole(role: RoleKey) {
     currentRole.value = role
     setDemoRoleHeader(role)
@@ -57,6 +61,7 @@ export function usePermissions() {
     permissions,
     loadCurrentUser,
     loadRoles,
+    refreshRoles,
     setRole,
     hasPermission,
     hasAnyPermission,

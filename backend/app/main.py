@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import auth, contracts, dashboard, finance, maintenance, properties, tenants
+from app.routers import auth, contracts, dashboard, finance, maintenance, permissions, properties, tenants
 
 app = FastAPI(title="Apartment Management API", version="0.1.0")
 
@@ -14,6 +14,7 @@ app.add_middleware(
 )
 
 app.include_router(auth.router, prefix="/api")
+app.include_router(permissions.router, prefix="/api")
 app.include_router(dashboard.router, prefix="/api")
 app.include_router(properties.router, prefix="/api")
 app.include_router(tenants.router, prefix="/api")

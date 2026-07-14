@@ -10,6 +10,7 @@ import {
   ReceiptText,
   Search,
   Settings,
+  ShieldCheck,
   UserRound,
   Users,
   Wrench,
@@ -38,6 +39,7 @@ const navItems: Array<{ key: PageKey; label: string; hint: string; icon: Compone
   { key: 'maintenance', label: '工单维修', hint: '报修处理', icon: Wrench, permission: pagePermissions.maintenance },
   { key: 'finance', label: '财务管理', hint: '账单与收支', icon: Landmark, permission: pagePermissions.finance },
   { key: 'reconciliation', label: '流水对账', hint: '银行流水', icon: ReceiptText, permission: pagePermissions.reconciliation },
+  { key: 'permissions', label: '权限管理', hint: '角色与授权', icon: ShieldCheck, permission: pagePermissions.permissions },
 ]
 
 const visibleNavItems = computed(() => navItems.filter((item) => hasPermission(item.permission)))
@@ -69,7 +71,7 @@ const visibleNavItems = computed(() => navItems.filter((item) => hasPermission(i
         </select>
       </div>
 
-      <nav class="mt-2 flex-1 space-y-1 px-3">
+      <nav class="mt-2 flex-1 space-y-1 overflow-y-auto px-3 pb-3">
         <button
           v-for="item in visibleNavItems"
           :key="item.key"
