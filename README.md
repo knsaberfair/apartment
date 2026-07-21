@@ -2,7 +2,7 @@
 
 基于 **Vue 3 + Vite + TypeScript + Tailwind CSS**、**Python + FastAPI** 和 **微信小程序** 的公寓管理系统 MVP。当前版本已支持 SQLite 持久化、Bearer Token 登录、RBAC 角色权限管理、动态菜单、中文企业后台，以及租户端小程序的合同、账单、报修和个人中心能力。
 
-> 注意：管理后台和后端的真实项目目录是 `/Users/admin/Desktop/apartment `，目录名末尾有空格。命令中建议使用双引号包住路径。租户端微信小程序目前位于 `/Users/admin/Desktop/apartment/tenant-mini-program`。
+> 注意：管理后台和后端位于当前项目根目录；租户端微信小程序目前位于相邻目录 `../apartment/tenant-mini-program`。命令中建议使用双引号包住路径。
 
 ## 项目结构
 
@@ -11,8 +11,7 @@
 ├── backend/   # FastAPI REST API，SQLite 持久化数据、权限和租户端 API
 └── frontend/  # Vue 3 + Vite 管理后台
 
-/Users/admin/Desktop/apartment/tenant-mini-program
-└── tenant-mini-program/  # 租户端微信小程序
+../apartment/tenant-mini-program/  # 租户端微信小程序
 ```
 
 ## 默认演示账号
@@ -33,7 +32,7 @@
 ## 后端启动
 
 ```bash
-cd "/Users/admin/Desktop/apartment /backend"
+cd "backend"
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -73,7 +72,7 @@ APARTMENT_ENV=development APARTMENT_ENABLE_DEMO_SEED=true uvicorn app.main:app -
 ## 前端启动
 
 ```bash
-cd "/Users/admin/Desktop/apartment /frontend"
+cd "frontend"
 npm install
 VITE_ENABLE_DEMO_ACCOUNTS=true npm run dev -- --host 127.0.0.1
 ```
@@ -85,7 +84,7 @@ VITE_ENABLE_DEMO_ACCOUNTS=true npm run dev -- --host 127.0.0.1
 小程序目录：
 
 ```bash
-cd "/Users/admin/Desktop/apartment/tenant-mini-program"
+cd "../apartment/tenant-mini-program"
 ```
 
 使用微信开发者工具打开该目录即可预览。当前小程序页面包括：
@@ -111,13 +110,13 @@ cd "/Users/admin/Desktop/apartment/tenant-mini-program"
 前端构建：
 
 ```bash
-npm --prefix "/Users/admin/Desktop/apartment /frontend" run build
+npm --prefix "frontend" run build
 ```
 
 后端编译：
 
 ```bash
-cd "/Users/admin/Desktop/apartment /backend"
+cd "backend"
 source .venv/bin/activate
 python3 -m compileall app
 ```
@@ -125,7 +124,7 @@ python3 -m compileall app
 后端测试：
 
 ```bash
-cd "/Users/admin/Desktop/apartment /backend"
+cd "backend"
 source .venv/bin/activate
 python3 -m pytest
 ```
