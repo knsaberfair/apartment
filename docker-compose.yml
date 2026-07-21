@@ -1,0 +1,39 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: apartment-backend
+    environment:
+      APARTMENT_ENV: ${APARTMENT_ENV:-production}
+      APARTMENT_DB_PATH: /data/app.db
+      APARTMENT_JWT_SECRET: ${APARTMENT_JWT_SECRET:?set APARTMENT_JWT_SECRET in your environment}
+      APARTMENT_ENABLE_DEMO_SEED: ${APARTMENT_ENABLE_DEMO_SEED:-false}
+      APARTMENT_ALLOW_DEMO_ROLE_HEADER: ${APARTMENT_ALLOW_DEMO_ROLE_HEADER:-false}
+      APARTMENT_WECHAT_APP_ID: ${APARTMENT_WECHAT_APP_ID:-}
+      APARTMENT_WECHAT_APP_SECRET: ${APARTMENT_WECHAT_APP_SECRET:-}
+      APARTMENT_WECHAT_MOCK_LOGIN: ${APARTMENT_WECHAT_MOCK_LOGIN:-false}
+    volumes:
+      - apartment-data:/data
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: apartment-frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "5173:80"
+    restart: unless-stopped
+
+volumes:
+  apartment-data:

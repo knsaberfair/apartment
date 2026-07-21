@@ -105,6 +105,31 @@ cd "tenant-mini-program"
 
 开发/测试环境默认启用微信 mock 登录，便于本地调试；非开发/测试环境禁止开启 mock 登录。
 
+## Docker 部署
+
+项目根目录已提供 `docker-compose.yml`，默认按生产安全方式启动：
+
+```bash
+export APARTMENT_JWT_SECRET='replace-with-a-strong-secret'
+docker compose up --build
+```
+
+本地演示时可额外开启演示数据和 mock 登录：
+
+```bash
+export APARTMENT_ENV=development
+export APARTMENT_ENABLE_DEMO_SEED=true
+export APARTMENT_WECHAT_MOCK_LOGIN=true
+docker compose up --build
+```
+
+启动后访问：
+
+- 后端 API：`http://127.0.0.1:8000`
+- 管理后台：`http://127.0.0.1:5173`
+
+后端容器默认使用 Docker volume `apartment-data` 持久化 SQLite 数据，前端容器通过 Nginx 将 `/api` 代理到后端服务。不要在保留数据时执行 `docker compose down -v`。
+
 ## 构建和测试
 
 前端构建：
@@ -137,7 +162,7 @@ python3 -m pytest
 
 - `APARTMENT_ENV`：运行环境，默认 `production`；非 `development/test` 时必须显式配置 `APARTMENT_JWT_SECRET`
 - `APARTMENT_DB_PATH`：SQLite 数据库路径，默认 `backend/app.db`
-- `APARTMENT_JWT_SECRET`：JWT 密钥，生产环境必须修改
+- `APARTMENT_JWT_SECRET`：JWT 密钥，生产环境必须修改并显式提供
 - `APARTMENT_TOKEN_EXPIRE_MINUTES`：登录 token 有效期，默认 480 分钟
 - `APARTMENT_ENABLE_DEMO_SEED`：是否写入默认演示账号，默认仅 `development/test` 环境开启，生产环境禁止开启
 - `APARTMENT_ALLOW_DEMO_ROLE_HEADER`：是否允许旧版 `X-Demo-Role` 演示头，默认关闭，生产环境禁止开启
