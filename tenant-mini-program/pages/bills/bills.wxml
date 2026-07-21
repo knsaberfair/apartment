@@ -1,0 +1,40 @@
+<view class="page container">
+  <view class="page-head">
+    <view class="page-kicker">BILLS</view>
+    <view class="page-title">我的账单</view>
+    <view class="page-subtitle">选择账单后查看详情，并可直接发起微信支付。</view>
+  </view>
+
+  <view class="card summary-card section" wx:if="{{selected}}">
+    <view class="list-item-head">
+      <view class="title">{{selected.period}} 账单</view>
+      <view class="status-chip {{selected.status === 'paid' ? 'status-success' : selected.status === 'overdue' ? 'status-danger' : 'status-warning'}}">{{selected.status}}</view>
+    </view>
+    <view class="section-caption">{{selected.type || 'fee'}} · {{selected.method || '未支付'}}</view>
+    <view class="amount">¥{{selected.amount}}</view>
+    <view class="detail-row"><text>Bill ID</text><text>{{selected.id}}</text></view>
+    <view class="detail-row"><text>Due Date</text><text>{{selected.dueDate}}</text></view>
+    <view class="detail-row"><text>Room</text><text>{{selected.apartment || '-'}} · {{selected.room || '-'}}</text></view>
+    <view class="auth-note" wx:if="{{selected.note}}">{{selected.note}}</view>
+    <button wx:if="{{selected.status !== 'paid'}}" class="button" loading="{{paying}}" bindtap="onPay">微信支付</button>
+    <view wx:if="{{selected.status === 'paid'}}" class="status-chip status-success">已完成支付</view>
+  </view>
+
+  <view class="card section">
+    <view class="section-title">账单列表</view>
+    <view class="section-caption">点击任意账单查看详情。</view>
+    <block wx:if="{{bills.length}}">
+      <view wx:for="{{bills}}" wx:key="id" bindtap="selectBill" data-id="{{item.id}}" class="list-item card-tappable {{selected && selected.id === item.id ? 'card-selected' : ''}}">
+        <view class="list-item-head">
+          <view class="list-item-title">{{item.period}} · ¥{{item.amount}}</view>
+          <view class="status-chip {{item.status === 'paid' ? 'status-success' : item.status === 'overdue' ? 'status-danger' : 'status-warning'}}">{{item.status}}</view>
+        </view>
+        <view class="list-item-subtitle">Due {{item.dueDate}} · {{item.type || 'fee'}}</view>
+      </view>
+    </block>
+    <view wx:if="{{!bills.length}}" class="empty">
+      <view class="empty-title">暂无账单</view>
+      <view class="empty-text">待缴和历史账单会在这里显示。</view>
+    </view>
+  </view>
+</view>

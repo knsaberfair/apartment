@@ -1,0 +1,53 @@
+<view class="page container">
+  <view class="page-head">
+    <view class="page-kicker">CONTRACTS</view>
+    <view class="page-title">我的合同</view>
+    <view class="page-subtitle">查看当前租约、租期、月租和押金信息。</view>
+  </view>
+
+  <view class="card summary-card section" wx:if="{{selected}}">
+    <view class="list-item-head">
+      <view class="title">{{selected.apartment}} · {{selected.room}}</view>
+      <view class="status-chip {{selected.status === 'active' ? 'status-success' : 'status-warning'}}">{{selected.status}}</view>
+    </view>
+    <view class="subtitle">剩余 {{selected.daysLeft || 0}} 天</view>
+    <view class="detail-row"><text>Contract ID</text><text>{{selected.id}}</text></view>
+    <view class="detail-row"><text>Lease</text><text>{{selected.startDate}} → {{selected.endDate}}</text></view>
+    <view class="detail-row"><text>Monthly Rent</text><text>¥{{selected.monthlyRent || '-'}}</text></view>
+    <view class="detail-row"><text>Deposit</text><text>¥{{selected.deposit || '-'}}</text></view>
+  </view>
+
+  <view class="card section">
+    <view class="section-title">合同列表</view>
+    <view class="section-caption">点击合同卡片查看完整租约信息。</view>
+    <block wx:if="{{contracts.length}}">
+      <view wx:for="{{contracts}}" wx:key="id" bindtap="selectContract" data-id="{{item.id}}" class="contract-list-item card-tappable {{selected && selected.id === item.id ? 'card-selected' : ''}}">
+        <view class="list-item-head contract-list-head">
+          <view>
+            <view class="list-item-title">{{item.apartment}} · {{item.room}}</view>
+            <view class="contract-meta">{{item.startDate}} → {{item.endDate}}</view>
+          </view>
+          <view class="status-chip {{item.status === 'active' ? 'status-success' : 'status-warning'}}">{{item.status}}</view>
+        </view>
+        <view class="contract-stats">
+          <view class="contract-stat">
+            <view class="contract-stat-label">月租</view>
+            <view class="contract-stat-value">¥{{item.monthlyRent || '-'}}</view>
+          </view>
+          <view class="contract-stat">
+            <view class="contract-stat-label">押金</view>
+            <view class="contract-stat-value">¥{{item.deposit || '-'}}</view>
+          </view>
+          <view class="contract-stat">
+            <view class="contract-stat-label">剩余</view>
+            <view class="contract-stat-value">{{item.daysLeft || 0}} 天</view>
+          </view>
+        </view>
+      </view>
+    </block>
+    <view wx:if="{{!contracts.length}}" class="empty">
+      <view class="empty-title">暂无合同</view>
+      <view class="empty-text">绑定完成后可在这里查看当前租约。</view>
+    </view>
+  </view>
+</view>

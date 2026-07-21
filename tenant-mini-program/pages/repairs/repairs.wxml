@@ -1,0 +1,55 @@
+<view class="page container">
+  <view class="page-head">
+    <view class="page-kicker">REPAIRS</view>
+    <view class="page-title">报修服务</view>
+    <view class="page-subtitle">提交新的居住问题，也可以跟踪工单处理进度。</view>
+  </view>
+
+  <view class="card form-card section">
+    <view class="section-title">提交报修</view>
+    <view class="section-caption">描述问题并选择分类、优先级和期望日期。</view>
+    <view class="field-label">问题标题</view>
+    <input class="input" placeholder="例如 空调异响" value="{{form.title}}" bindinput="onTitleInput" />
+    <view class="field-label">问题分类</view>
+    <input class="input" placeholder="例如 家电 / 水电" value="{{form.category}}" bindinput="onCategoryInput" />
+    <view class="field-label">优先级</view>
+    <picker mode="selector" range="{{priorities}}" bindchange="onPriorityChange">
+      <view class="input">{{form.priority}}</view>
+    </picker>
+    <view class="field-label">期望处理日期</view>
+    <picker mode="date" value="{{form.dueAt}}" bindchange="onDueDateChange">
+      <view class="input">{{form.dueAt}}</view>
+    </picker>
+    <button class="button" loading="{{submitting}}" bindtap="onSubmitRepair">提交报修</button>
+  </view>
+
+  <view class="card summary-card section" wx:if="{{selected}}">
+    <view class="list-item-head">
+      <view class="title">{{selected.title}}</view>
+      <view class="status-chip {{selected.status === 'done' ? 'status-success' : 'status-warning'}}">{{selected.status}}</view>
+    </view>
+    <view class="subtitle">{{selected.priority || 'medium'}} · {{selected.category || '-'}}</view>
+    <view class="detail-row"><text>Repair ID</text><text>{{selected.id}}</text></view>
+    <view class="detail-row"><text>Assignee</text><text>{{selected.assignee || '未分配'}}</text></view>
+    <view class="detail-row"><text>Created</text><text>{{selected.createdAt}}</text></view>
+    <view class="detail-row"><text>Due</text><text>{{selected.dueAt || '-'}}</text></view>
+  </view>
+
+  <view class="card section">
+    <view class="section-title">报修列表</view>
+    <view class="section-caption">点击条目查看工单进度。</view>
+    <block wx:if="{{repairs.length}}">
+      <view wx:for="{{repairs}}" wx:key="id" bindtap="selectRepair" data-id="{{item.id}}" class="list-item card-tappable {{selected && selected.id === item.id ? 'card-selected' : ''}}">
+        <view class="list-item-head">
+          <view class="list-item-title">{{item.title}}</view>
+          <view class="status-chip {{item.status === 'done' ? 'status-success' : 'status-warning'}}">{{item.status}}</view>
+        </view>
+        <view class="list-item-subtitle">{{item.createdAt}} · {{item.category || '-'}}</view>
+      </view>
+    </block>
+    <view wx:if="{{!repairs.length}}" class="empty">
+      <view class="empty-title">暂无报修</view>
+      <view class="empty-text">提交后会在这里显示新的工单。</view>
+    </view>
+  </view>
+</view>

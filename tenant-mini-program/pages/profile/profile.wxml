@@ -1,0 +1,26 @@
+<view class="page container">
+  <view class="page-head">
+    <view class="page-kicker">PROFILE</view>
+    <view class="page-title">个人中心</view>
+    <view class="page-subtitle">查看当前绑定的租户身份和房间信息。</view>
+  </view>
+
+  <block wx:if="{{tenant}}">
+    <view class="card summary-card">
+      <view class="section-title">{{tenant.name}}</view>
+      <view class="section-caption">{{tenant.phone || 'No phone saved'}}</view>
+      <view class="chip-row">
+        <view class="pill">{{tenant.apartment || 'TBD'}}</view>
+        <view class="pill">{{tenant.room || 'TBD'}}</view>
+      </view>
+      <view class="detail-row"><text>Tenant ID</text><text>{{tenant.id}}</text></view>
+      <view class="detail-row"><text>Apartment</text><text>{{tenant.apartment || 'TBD'}}</text></view>
+      <view class="detail-row"><text>Room</text><text>{{tenant.room || 'TBD'}}</text></view>
+      <button class="button-secondary button-danger" bindtap="onLogout">退出登录</button>
+    </view>
+  </block>
+  <view wx:if="{{!tenant}}" class="card empty">
+    <view class="empty-title">未登录</view>
+    <view class="empty-text">请先完成租户绑定。</view>
+  </view>
+</view>

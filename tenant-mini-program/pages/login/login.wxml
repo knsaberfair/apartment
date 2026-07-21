@@ -1,0 +1,17 @@
+<view class="page container">
+  <view class="page-head">
+    <view class="page-kicker">TENANT PORTAL</view>
+    <view class="page-title">欢迎回家</view>
+    <view class="page-subtitle">绑定租户身份后，随时查看租约、账单和报修进度。</view>
+  </view>
+
+  <view class="card summary-card">
+    <view class="section-title">租户登录</view>
+    <view class="section-caption">请输入物业提供的 Tenant ID。测试租户示例：T-10001</view>
+    <view class="field-label">Tenant ID</view>
+    <input class="input" placeholder="例如 T-10001" value="{{tenantId}}" bindinput="onTenantInput" />
+    <button class="button" loading="{{loading}}" bindtap="onLogin">进入租户端</button>
+    <view wx:if="{{error}}" class="auth-note auth-error">{{error}}</view>
+    <view wx:if="{{!error}}" class="auth-note">仅用于租户本人查看合同、缴费和报修服务。</view>
+  </view>
+</view>

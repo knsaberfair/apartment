@@ -1,0 +1,16 @@
+{
+  "pages": [
+    "pages/login/login",
+    "pages/home/home",
+    "pages/contracts/contracts",
+    "pages/bills/bills",
+    "pages/repairs/repairs",
+    "pages/profile/profile"
+  ],
+  "window": {
+    "navigationBarTitleText": "Tenant Portal",
+    "navigationBarBackgroundColor": "#1e293b",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f8f9ff"
+  }
+}

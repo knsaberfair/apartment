@@ -1,0 +1,90 @@
+<view class="page container">
+  <view class="page-head" wx:if="{{tenant}}">
+    <view class="page-kicker">HOME</view>
+    <view class="page-title">你好，{{tenant.name}}</view>
+    <view class="page-subtitle">{{tenant.apartment || 'Apartment'}} · {{tenant.room || 'TBD'}}</view>
+  </view>
+
+  <view class="card summary-card" wx:if="{{tenant}}">
+    <view class="section-title">居住概览</view>
+    <view class="section-caption">合同、账单和报修都在这里快速进入。</view>
+    <view class="chip-row">
+      <view class="pill">Tenant ID: {{tenant.id}}</view>
+      <view class="pill" wx:if="{{tenant.phone}}">{{tenant.phone}}</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">快捷入口</view>
+    <view class="section-caption">常用服务，一点即达。</view>
+    <view class="action-grid">
+      <view class="action-card" bindtap="goTo" data-page="contracts">
+        <view class="action-title">我的合同</view>
+        <view class="action-text">查看租约与押金信息</view>
+      </view>
+      <view class="action-card" bindtap="goTo" data-page="bills">
+        <view class="action-title">我的账单</view>
+        <view class="action-text">查看待缴与历史账单</view>
+      </view>
+      <view class="action-card" bindtap="goTo" data-page="repairs">
+        <view class="action-title">报修服务</view>
+        <view class="action-text">提交问题并跟踪进度</view>
+      </view>
+      <view class="action-card" bindtap="goTo" data-page="profile">
+        <view class="action-title">个人中心</view>
+        <view class="action-text">查看租户身份信息</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card section">
+    <view class="section-title">最近合同</view>
+    <block wx:if="{{contracts.length}}">
+      <view wx:for="{{contracts}}" wx:key="id" class="list-item">
+        <view class="list-item-head">
+          <view class="list-item-title">{{item.apartment}} · {{item.room}}</view>
+          <view class="status-chip {{item.status === 'active' ? 'status-success' : 'status-warning'}}">{{item.status}}</view>
+        </view>
+        <view class="list-item-subtitle">{{item.startDate}} → {{item.endDate}}</view>
+      </view>
+    </block>
+    <view wx:if="{{!contracts.length}}" class="empty">
+      <view class="empty-title">暂无合同</view>
+      <view class="empty-text">绑定租户后会显示当前租约。</view>
+    </view>
+  </view>
+
+  <view class="card section">
+    <view class="section-title">近期账单</view>
+    <block wx:if="{{bills.length}}">
+      <view wx:for="{{bills}}" wx:key="id" class="list-item">
+        <view class="list-item-head">
+          <view class="list-item-title">{{item.period}} · ¥{{item.amount}}</view>
+          <view class="status-chip {{item.status === 'paid' ? 'status-success' : item.status === 'overdue' ? 'status-danger' : 'status-warning'}}">{{item.status}}</view>
+        </view>
+        <view class="list-item-subtitle">Due {{item.dueDate}}</view>
+      </view>
+    </block>
+    <view wx:if="{{!bills.length}}" class="empty">
+      <view class="empty-title">暂无账单</view>
+      <view class="empty-text">待缴与历史账单会在这里展示。</view>
+    </view>
+  </view>
+
+  <view class="card section">
+    <view class="section-title">报修动态</view>
+    <block wx:if="{{repairs.length}}">
+      <view wx:for="{{repairs}}" wx:key="id" class="list-item">
+        <view class="list-item-head">
+          <view class="list-item-title">{{item.title}}</view>
+          <view class="status-chip {{item.status === 'done' ? 'status-success' : 'status-warning'}}">{{item.status}}</view>
+        </view>
+        <view class="list-item-subtitle">{{item.createdAt}}</view>
+      </view>
+    </block>
+    <view wx:if="{{!repairs.length}}" class="empty">
+      <view class="empty-title">暂无报修</view>
+      <view class="empty-text">提交报修后可在这里跟踪进度。</view>
+    </view>
+  </view>
+</view>

@@ -2,7 +2,7 @@
 
 基于 **Vue 3 + Vite + TypeScript + Tailwind CSS**、**Python + FastAPI** 和 **微信小程序** 的公寓管理系统 MVP。当前版本已支持 SQLite 持久化、Bearer Token 登录、RBAC 角色权限管理、动态菜单、中文企业后台，以及租户端小程序的合同、账单、报修和个人中心能力。
 
-> 注意：管理后台和后端位于当前项目根目录；租户端微信小程序目前位于相邻目录 `../apartment/tenant-mini-program`。命令中建议使用双引号包住路径。
+> 注意：管理后台、后端和租户端微信小程序均位于当前项目根目录。命令中建议使用双引号包住路径。
 
 ## 项目结构
 
@@ -11,7 +11,7 @@
 ├── backend/   # FastAPI REST API，SQLite 持久化数据、权限和租户端 API
 └── frontend/  # Vue 3 + Vite 管理后台
 
-../apartment/tenant-mini-program/  # 租户端微信小程序
+tenant-mini-program/  # 租户端微信小程序
 ```
 
 ## 默认演示账号
@@ -84,7 +84,7 @@ VITE_ENABLE_DEMO_ACCOUNTS=true npm run dev -- --host 127.0.0.1
 小程序目录：
 
 ```bash
-cd "../apartment/tenant-mini-program"
+cd "tenant-mini-program"
 ```
 
 使用微信开发者工具打开该目录即可预览。当前小程序页面包括：
