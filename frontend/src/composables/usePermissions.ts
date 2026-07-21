@@ -1,22 +1,27 @@
 import { computed, ref } from 'vue'
 import { orderedPages, pagePermissions } from '@/config/permissions'
-import { api, setDemoRoleHeader } from '@/services/api'
+import { api } from '@/services/api'
 import type { CurrentUser, PermissionKey, PermissionResource, RoleDefinition, RoleKey } from '@/types/auth'
 import type { BuiltInPageKey, PageKey } from '@/types/navigation'
 
-const currentRole = ref<RoleKey>('manager')
 const currentUser = ref<CurrentUser | null>(null)
 const roles = ref<RoleDefinition[]>([])
 const permissionResources = ref<PermissionResource[]>([])
 const loadingPermissions = ref(false)
+const authReady = ref(false)
 
 const permissions = computed(() => new Set(currentUser.value?.permissions ?? []))
 const menuResources = computed(() => permissionResources.value.filter((resource) => resource.type === 'menu'))
+const currentRole = computed<RoleKey>(() => currentUser.value?.role ?? 'viewer')
+const isAuthenticated = computed(() => currentUser.value !== null)
+
+export const demoAccountsEnabled = import.meta.env.VITE_ENABLE_DEMO_ACCOUNTS === 'true'
+const demoRoleKeys = demoAccountsEnabled ? new Set(['super_admin', 'manager', 'leasing_agent', 'maintenance_staff', 'finance_staff', 'viewer']) : new Set<string>()
+const demoRoles = computed(() => roles.value.filter((role) => demoRoleKeys.has(role.key)))
 
 export function usePermissions() {
   async function loadCurrentUser() {
     loadingPermissions.value = true
-    setDemoRoleHeader(currentRole.value)
     try {
       currentUser.value = await api.me()
     } finally {
@@ -37,13 +42,55 @@ export function usePermissions() {
   }
 
   async function refreshPermissionResources() {
-    permissionResources.value = await api.permissionResources()
+    permissionResources.value = await api.permissionMenus()
+  }
+
+  async function login(username: string, password: string) {
+    loadingPermissions.value = true
+    try {
+      const response = await api.login({ username, password })
+      currentUser.value = response.user
+      await Promise.all([loadRoles(), loadPermissionResources()])
+    } finally {
+      loadingPermissions.value = false
+      authReady.value = true
+    }
+  }
+
+  async function restoreSession() {
+    loadingPermissions.value = true
+    try {
+      currentUser.value = await api.me()
+      await Promise.all([loadRoles(), loadPermissionResources()])
+    } catch {
+      currentUser.value = null
+      roles.value = []
+      permissionResources.value = []
+    } finally {
+      loadingPermissions.value = false
+      authReady.value = true
+    }
+  }
+
+  async function logout() {
+    await api.logout()
+    currentUser.value = null
+    roles.value = []
+    permissionResources.value = []
   }
 
   async function setRole(role: RoleKey) {
-    currentRole.value = role
-    setDemoRoleHeader(role)
-    await loadCurrentUser()
+    if (!demoAccountsEnabled || !demoRoleKeys.has(role)) return
+
+    loadingPermissions.value = true
+    try {
+      const response = await api.demoLogin({ role })
+      currentUser.value = response.user
+      await Promise.all([loadRoles(), loadPermissionResources()])
+    } finally {
+      loadingPermissions.value = false
+      authReady.value = true
+    }
   }
 
   function hasPermission(permission?: PermissionKey) {
@@ -61,9 +108,10 @@ export function usePermissions() {
 
   function canViewPage(page: PageKey) {
     const customPermission = getCustomPermissionFromPage(page)
-    if (customPermission) {
-      return hasPermission(customPermission)
+    if (customPermission !== null) {
+      return menuResources.value.some((resource) => resource.key === customPermission && hasPermission(resource.key))
     }
+    if (!Object.prototype.hasOwnProperty.call(pagePermissions, page)) return false
     return hasPermission(pagePermissions[page as BuiltInPageKey])
   }
 
@@ -84,10 +132,17 @@ export function usePermissions() {
     currentRole,
     currentUser,
     roles,
+    demoAccountsEnabled,
+    demoRoles,
     permissionResources,
     menuResources,
     loadingPermissions,
+    authReady,
+    isAuthenticated,
     permissions,
+    login,
+    logout,
+    restoreSession,
     loadCurrentUser,
     loadRoles,
     refreshRoles,

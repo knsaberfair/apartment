@@ -5,6 +5,8 @@ frontend/node_modules/
 # Build outputs
 frontend/dist/
 frontend/.vite/
+frontend/playwright-report/
+frontend/test-results/
 
 # Python
 __pycache__/
@@ -17,6 +19,13 @@ backend/.venv/
 .mypy_cache/
 .ruff_cache/
 
+# Local databases
+*.db
+*.sqlite
+backend/app.db
+backend/test_app.db
+backend/data/*.db
+
 # Environment
 .env
 .env.*
@@ -26,3 +35,6 @@ backend/.venv/
 .DS_Store
 .idea/
 .vscode/
+
+# Local agent state
+.omc/

@@ -1,18 +1,27 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { Activity, AlertTriangle, Banknote, Building2 } from '@lucide/vue'
+import { ElButton, ElCard } from 'element-plus'
 import StatCard from '@/components/ui/StatCard.vue'
 import StatusChip from '@/components/ui/StatusChip.vue'
 import { pageActionPermissions } from '@/config/permissions'
 import { usePermissions } from '@/composables/usePermissions'
-import { api, compactCurrency, currency } from '@/services/api'
+import { api, compactCurrency, currency, downloadBlob } from '@/services/api'
 import type { DashboardSummary } from '@/types/domain'
 
 const summary = ref<DashboardSummary | null>(null)
 const loading = ref(true)
+const exporting = ref(false)
 const error = ref('')
+const actionError = ref('')
 const icons = [Building2, Activity, Banknote, AlertTriangle]
 const { hasPermission } = usePermissions()
+const trendMaxIncome = computed(() => Math.max(...(summary.value?.income_trend.map((item) => item.income) ?? [0]), 0))
+
+function trendBarHeight(income: number) {
+  if (trendMaxIncome.value <= 0) return 24
+  return Math.max(24, Math.round((income / trendMaxIncome.value) * 220))
+}
 
 onMounted(async () => {
   try {
@@ -23,29 +32,43 @@ onMounted(async () => {
     loading.value = false
   }
 })
+
+async function exportDashboard() {
+  if (!hasPermission(pageActionPermissions.dashboardExport)) return
+  exporting.value = true
+  actionError.value = ''
+  try {
+    downloadBlob(await api.exportDashboard(), 'dashboard-summary.csv')
+  } catch (err) {
+    actionError.value = err instanceof Error ? err.message : '导出运营日报失败'
+  } finally {
+    exporting.value = false
+  }
+}
 </script>
 
 <template>
   <section class="space-y-6">
-    <div class="flex items-end justify-between">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div>
         <p class="eyebrow">Operation Cockpit</p>
         <h1 class="mt-2 text-3xl font-bold tracking-[-0.03em] text-slate-950">管理控制台</h1>
         <p class="mt-2 text-sm text-slate-500">实时掌握房源出租、租金收缴、合同风险与维修工单状态。</p>
       </div>
-      <button v-if="hasPermission(pageActionPermissions.dashboardExport)" class="primary-button" type="button">生成运营日报</button>
+      <el-button v-if="hasPermission(pageActionPermissions.dashboardExport)" type="primary" :loading="exporting" @click="exportDashboard">生成运营日报</el-button>
     </div>
 
-    <div v-if="loading" class="panel p-8 text-sm text-slate-500">正在加载运营数据...</div>
-    <div v-else-if="error" class="panel border-rose-200 bg-rose-50 p-8 text-sm text-rose-700">{{ error }}</div>
+    <el-card v-if="actionError" shadow="never" class="rounded-2xl border-rose-200 bg-rose-50 text-sm text-rose-700">{{ actionError }}</el-card>
+    <el-card v-if="loading" shadow="never" class="rounded-2xl text-sm text-slate-500">正在加载运营数据...</el-card>
+    <el-card v-else-if="error" shadow="never" class="rounded-2xl border-rose-200 bg-rose-50 text-sm text-rose-700">{{ error }}</el-card>
 
     <template v-else-if="summary">
-      <div class="grid grid-cols-4 gap-5">
+      <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard v-for="(metric, index) in summary.metrics" :key="metric.label" v-bind="metric" :icon="icons[index]" />
       </div>
 
-      <div class="grid grid-cols-[1.2fr_0.8fr] gap-5">
-        <article class="panel p-6">
+      <div class="grid grid-cols-1 gap-5 xl:grid-cols-[1.2fr_0.8fr]">
+        <el-card shadow="never" class="rounded-2xl">
           <div class="flex items-center justify-between">
             <div>
               <p class="eyebrow">Income Trend</p>
@@ -55,16 +78,16 @@ onMounted(async () => {
           </div>
           <div class="mt-8 flex h-64 items-end gap-4 border-b border-slate-200 px-2 pb-3">
             <div v-for="item in summary.income_trend" :key="item.month" class="flex flex-1 flex-col items-center gap-3">
-              <div class="w-full rounded-t-xl bg-brand-900 shadow-card" :style="{ height: `${Math.max(24, item.income / 5200)}px` }" />
+              <div class="w-full rounded-t-xl bg-brand-900 shadow-card" :style="{ height: `${trendBarHeight(item.income)}px` }" />
               <span class="text-xs font-semibold text-slate-500">{{ item.month }}</span>
             </div>
           </div>
-        </article>
+        </el-card>
 
-        <article class="panel p-6">
+        <el-card shadow="never" class="rounded-2xl">
           <p class="eyebrow">Occupancy</p>
           <h2 class="section-title mt-2">出租率健康度</h2>
-          <div class="mt-7 flex items-center gap-6">
+          <div class="mt-7 flex flex-col items-center gap-6 sm:flex-row">
             <div class="grid h-36 w-36 place-items-center rounded-full p-3" :style="{ background: `conic-gradient(#10b981 ${summary.occupancy_rate * 3.6}deg, #e2e8f0 0deg)` }">
               <div class="grid h-full w-full place-items-center rounded-full bg-white">
                 <span class="text-3xl font-bold text-slate-950 tabular">{{ summary.occupancy_rate }}%</span>
@@ -78,14 +101,14 @@ onMounted(async () => {
               </div>
             </div>
           </div>
-        </article>
+        </el-card>
       </div>
 
-      <div class="grid grid-cols-2 gap-5">
-        <article class="panel p-6">
+      <div class="grid grid-cols-1 gap-5 xl:grid-cols-2">
+        <el-card shadow="never" class="rounded-2xl">
           <h2 class="section-title">近期合同</h2>
           <div class="mt-4 divide-y divide-slate-100">
-            <div v-for="contract in summary.recent_contracts" :key="contract.id" class="flex items-center justify-between py-4">
+            <div v-for="contract in summary.recent_contracts" :key="contract.id" class="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p class="font-semibold text-slate-900">{{ contract.tenant }} · {{ contract.room }}</p>
                 <p class="mt-1 text-xs text-slate-500">{{ contract.id }} · 到期 {{ contract.end_date }}</p>
@@ -96,12 +119,12 @@ onMounted(async () => {
               </div>
             </div>
           </div>
-        </article>
+        </el-card>
 
-        <article class="panel p-6">
+        <el-card shadow="never" class="rounded-2xl">
           <h2 class="section-title">紧急工单</h2>
           <div class="mt-4 divide-y divide-slate-100">
-            <div v-for="order in summary.urgent_work_orders" :key="order.id" class="flex items-center justify-between py-4">
+            <div v-for="order in summary.urgent_work_orders" :key="order.id" class="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p class="font-semibold text-slate-900">{{ order.title }}</p>
                 <p class="mt-1 text-xs text-slate-500">{{ order.room }} · {{ order.assignee }} · {{ order.due_at }}</p>
@@ -112,7 +135,7 @@ onMounted(async () => {
               </div>
             </div>
           </div>
-        </article>
+        </el-card>
       </div>
     </template>
   </section>

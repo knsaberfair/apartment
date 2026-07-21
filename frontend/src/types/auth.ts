@@ -28,6 +28,7 @@ export type BuiltInPermissionKey =
   | 'reconciliation:view'
   | 'reconciliation:import'
   | 'reconciliation:export'
+  | 'audit:view'
   | 'permissions:view'
   | 'permissions:manage'
   | 'system:settings'
@@ -44,10 +45,24 @@ export interface CurrentUser {
   permissions: PermissionKey[]
 }
 
+export interface LoginPayload {
+  username: string
+  password: string
+}
+
+export interface LoginResponse {
+  user: CurrentUser
+}
+
+export interface DemoLoginPayload {
+  role: RoleKey
+}
+
 export interface RoleDefinition {
   key: RoleKey
   label: string
   permissions: PermissionKey[]
+  built_in: boolean
 }
 
 export interface PermissionDefinition {
@@ -89,6 +104,10 @@ export interface CreateRolePayload {
   key: string
   label: string
   permissions: PermissionKey[]
+}
+
+export interface UpdateRolePayload {
+  label: string
 }
 
 export interface CreatePermissionResourcePayload {
